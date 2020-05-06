@@ -1,0 +1,297 @@
+﻿@*@model IEnumerable<Code_First_Approach_in_Entity_Framework.Models.Product>*@
+@model CRUD_jQuery_MVC.ViewModel.ProductViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <style type="text/css">
+        body {
+            font-family: Arial;
+            font-size: 10pt;
+        }
+
+        .table {
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background-color: #F7F7F7;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .table th, .table td {
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <script src="~/bootstrap/js/dist/jquery.min.js"></script>
+    <link href="~/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/bootstrap/dist/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+    <table id="tblProduct" class="table" cellpadding="0" cellspacing="0">
+        <tr>
+            <th style="width:100px">Product Id</th>
+            <th style="width:150px">Product Name</th>
+            <th style="width:150px">Category Id</th>
+            <th style="width:150px">Category Name</th>
+            <th style="width:150px">Action</th>
+        </tr>
+        @foreach (Code_First_Approach_in_Entity_Framework.Models.Product product in Model.PaginatedProducts())
+        {
+            <tr>
+                <td class="ProductID">
+                    <span>@product.ProductID</span>
+                </td>
+                <td class="ProductName">
+                    <span>@product.ProductName</span>
+                    <input type="text" class="form-control" value="@product.ProductName" style="display:none" />
+                </td>
+                <td class="CategoryID">
+                    <span>@product.CategoryID</span>
+                    <input type="text" class="form-control" value="@product.CategoryID" style="display:none" />
+                </td>
+                <td class="CategoryName">
+                    <span>@product.CategoryName</span>
+                    <input type="text" class="form-control" value="@product.CategoryName" style="display:none" />
+                </td>
+                <td>
+                    <a class="Edit" href="javascript:;">Edit</a>
+                    <a class="Update" href="javascript:;" style="display:none">Update</a>
+                    <a class="Cancel" href="javascript:;" style="display:none">Cancel</a>
+                    <a class="Delete" href="javascript:;">Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+    <br />
+    <br />
+    
+    <div id="collapseExample" class="form-row">
+
+        <div class="form-group col-md-2" style="margin-left:1%;">
+            <label class="control-label col-md-12" for="txtProductName">Product Name</label>
+            <input type="text" class="form-control" id="txtProductName" name="txtProductName" required>
+           
+        </div>
+        <div class="form-group col-md-2" style="margin-left:3%;">
+            <label class="control-label col-md-8" for="txtCategoryId">Category ID</label>
+            <input type="text" class="form-control" id="txtCategoryId" name="txtCategoryId" required>
+          
+        </div>
+        <div class="form-group col-md-2" style="margin-left:3%;">
+            <label class="control-label col-md-8" for="txtCategoryName">Category Name</label>
+            <input type="text" class="form-control" id="txtCategoryName" name="txtCategoryName" required>
+          
+        </div>
+        <div class="form-group col-md-1" style="margin-left:1%;">
+            <label class="control-label col-md-2" for=""> &nbsp;</label>
+            <button type="submit" class="btn btn-primary form-control" style="margin-left:1%;" id="btnAdd">
+                Add
+            </button>
+        </div> 
+    </div>
+        <br />
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.PageCount(); i++)
+            {
+                <li class="@(i == Model.CurrentPage ? "page-item active" : "page-item")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                </li>
+            }
+        </ul>
+
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+        <script type="text/javascript">
+            $(function () {
+                //Remove the dummy row if data present.
+                if ($("#tblProduct tr").length > 2) {
+                    //$("#tblProduct tr:eq(1)").remove();
+                } else {
+                    var row = $("#tblProduct tr:last-child");
+                    row.find(".Edit").hide();
+                    row.find(".Delete").hide();
+                    row.find("span").html('&nbsp;');
+                }
+            });
+
+            function AppendRow(row, prodID, name, catID, catname) {
+                //Bind ProductID.
+                $(".ProductID", row).find("span").html(prodID);
+
+                //Bind ProductName.
+                $(".ProductName", row).find("span").html(name);
+                $(".ProductName", row).find("input").val(name);
+
+                //Bind CategoryID.
+                $(".CategoryID", row).find("span").html(catID);
+                $(".CategoryID", row).find("input").val(catID);
+
+                //Bind CategoryName.
+                $(".CategoryName", row).find("span").html(catname);
+                $(".CategoryName", row).find("input").val(catname);
+
+                row.find(".Edit").show();
+                row.find(".Delete").show();
+                $("#tblProduct").append(row);
+            };
+
+            //Add event handler.
+            $("body").on("click", "#btnAdd", function () {
+                var txtName = $("#txtProductName");
+                var txtCategoryid = $("#txtCategoryId");
+                var txtCategoryName = $("#txtCategoryName");
+                if (txtName.val() != "" && txtCategoryid.val() != "" && txtCategoryName != "")
+                {
+                   
+                }
+                else {
+                    alert("All fields are required");
+                    return false;
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/InsertProduct",
+                    data: '{ProductName: "' + txtName.val() + '", CategoryID: "' + txtCategoryid.val() + '", CategoryName: "' + txtCategoryName.val() + '" }',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (r) {
+                        var row = $("#tblProduct tr:last-child");
+                        if ($("#tblProduct tr:last-child span").eq(0).html() != "&nbsp;") {
+                            row = row.clone();
+                        }
+                        AppendRow(row, r.ProductID, r.ProductName, r.CategoryID, r.CategoryName);
+                        txtName.val("");
+                        txtCategoryid.val("");
+                        txtCategoryName.val("");
+                    }
+                });
+            });
+
+            //Edit event handler.
+            $("body").on("click", "#tblProduct .Edit", function () {
+                var row = $(this).closest("tr");
+                $("td", row).each(function () {
+                    if ($(this).find("input").length > 0) {
+                        $(this).find("input").show();
+                        $(this).find("span").hide();
+                    }
+                });
+                row.find(".Update").show();
+                row.find(".Cancel").show();
+                row.find(".Delete").hide();
+                $(this).hide();
+            });
+
+            //Update event handler.
+            $("body").on("click", "#tblProduct .Update", function () {
+                var row = $(this).closest("tr");
+                $("td", row).each(function () {
+                    if ($(this).find("input").length > 0) {
+                        var span = $(this).find("span");
+                        var input = $(this).find("input");
+                        span.html(input.val());
+                        span.show();
+                        input.hide();
+                    }
+                });
+                row.find(".Edit").show();
+                row.find(".Delete").show();
+                row.find(".Cancel").hide();
+                $(this).hide();
+
+                var product = {};
+                product.CategoryID = row.find(".CategoryID").find("span").html();
+                product.ProductName = row.find(".ProductName").find("span").html();
+                product.CategoryName = row.find(".CategoryName").find("span").html();
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/UpdateProduct",
+                    data: '{product:' + JSON.stringify(product) + '}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json"
+                });
+            });
+
+            //Cancel event handler.
+            $("body").on("click", "#tblProduct .Cancel", function () {
+                var row = $(this).closest("tr");
+                $("td", row).each(function () {
+                    if ($(this).find("input").length > 0) {
+                        var span = $(this).find("span");
+                        var input = $(this).find("input");
+                        input.val(span.html());
+                        span.show();
+                        input.hide();
+                    }
+                });
+                row.find(".Edit").show();
+                row.find(".Delete").show();
+                row.find(".Update").hide();
+                $(this).hide();
+            });
+
+            //Delete event handler.
+            $("body").on("click", "#tblProduct .Delete", function () {
+                if (confirm("Do you want to delete this row?")) {
+                    var row = $(this).closest("tr");
+                    var prodID = row.find("span").eq("0").html();
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/DeleteProduct",
+                        data: '{prodID: ' + prodID + '}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            if ($("#tblProduct tr").length > 2) {
+                                row.remove();
+                            } else {
+                                row.find(".Edit").hide();
+                                row.find(".Delete").hide();
+                                row.find("span").html('&nbsp;');
+                            }
+                        }
+                    });
+                }
+            });
+            $(document).ready(function () {
+                $("#txtCategoryId").keydown(function (event) {
+                    // Allow only backspace and delete
+                    if (event.keyCode == 46 || event.keyCode == 8) {
+                        // let it happen, don't do anything
+                    }
+                    else {
+                        // Ensure that it is a number and stop the keypress
+                        if (event.keyCode < 48 || event.keyCode > 57) {
+                            alert("Only number are allowed");
+                            event.preventDefault();
+                        }
+                    }
+                });
+                $('input').on('keypress', function (e) {
+                    var regex = new RegExp("^[a-zA-Z0-9 ]+$");
+                    var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+                    console.log(regex.test(str));
+                    if (regex.test(str)) {
+                        return true;
+                    }
+
+                    e.preventDefault();
+                    return false;
+                });
+            });
+        </script>
+</body>
+</html>
