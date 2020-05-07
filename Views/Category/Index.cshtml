@@ -1,5 +1,4 @@
-﻿@*@model IEnumerable<Code_First_Approach_in_Entity_Framework.Models.Product>*@
-@model CRUD_jQuery_MVC.ViewModel.ProductViewModel
+﻿@model IEnumerable<CRUD_jQuery_MVC.Models.Category>
 
 @{
     Layout = null;
@@ -22,16 +21,16 @@
             border-collapse: collapse;
         }
 
-        .table th {
-            background-color: #F7F7F7;
-            color: #333;
-            font-weight: bold;
-        }
+            .table th {
+                background-color: #F7F7F7;
+                color: #333;
+                font-weight: bold;
+            }
 
-        .table th, .table td {
-            padding: 5px;
-            border: 1px solid #ccc;
-        }
+            .table th, .table td {
+                padding: 5px;
+                border: 1px solid #ccc;
+            }
     </style>
     <script src="~/bootstrap/js/dist/jquery.min.js"></script>
     <link href="~/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -39,31 +38,23 @@
 
 </head>
 <body>
-    <table id="tblProduct" class="table" cellpadding="0" cellspacing="0">
+    <table id="tblCategory" class="table" cellpadding="0" cellspacing="0">
         <tr>
-            <th style="width:100px">Product Id</th>
-            <th style="width:150px">Product Name</th>
             <th style="width:150px">Category Id</th>
             <th style="width:150px">Category Name</th>
             <th style="width:150px">Action</th>
         </tr>
-        @foreach (Code_First_Approach_in_Entity_Framework.Models.Product product in Model.PaginatedProducts())
+        @foreach (CRUD_jQuery_MVC.Models.Category category in Model)
         {
             <tr>
-                <td class="ProductID">
-                    <span>@product.ProductID</span>
-                </td>
-                <td class="ProductName">
-                    <span>@product.ProductName</span>
-                    <input type="text" class="form-control" value="@product.ProductName" style="display:none" />
-                </td>
+              
                 <td class="CategoryID">
-                    <span>@product.CategoryID</span>
-                    <input type="text" class="form-control" value="@product.CategoryID" style="display:none" disabled="disabled" />
+                    <span>@category.CategoryID</span>
+                    
                 </td>
                 <td class="CategoryName">
-                    <span>@product.CategoryName</span>
-                   @Html.DropDownList("txtCategoryNameEdit", Model.CategoryName, new { @class = "form-control",style="display:none" })
+                    <span>@category.CategoryName</span>
+                    <input type="text" class="form-control" value="@category.CategoryName" style="display:none" />
                 </td>
                 <td>
                     <a class="Edit" href="javascript:;">Edit</a>
@@ -76,57 +67,48 @@
     </table>
     <br />
     <br />
-    
+
     <div id="collapseExample" class="form-row">
 
-        <div class="form-group col-md-2" style="margin-left:1%;">
-            <label class="control-label col-md-12" for="txtProductName">Product Name</label>
-            <input type="text" class="form-control" id="txtProductName" name="txtProductName" required>
-           
-        </div>
         @*<div class="form-group col-md-2" style="margin-left:3%;">
             <label class="control-label col-md-8" for="txtCategoryId">Category ID</label>
             <input type="text" class="form-control" id="txtCategoryId" name="txtCategoryId" required>
-          
+
         </div>*@
         <div class="form-group col-md-2" style="margin-left:3%;">
             <label class="control-label col-md-8" for="txtCategoryName">Category Name</label>
-            @Html.DropDownList("txtCategoryName", Model.CategoryName, new { @class = "form-control" })
+            <input type="text" class="form-control" id="txtCategoryName" name="txtCategoryName" required>
 
-          
         </div>
         <div class="form-group col-md-1" style="margin-left:1%;">
             <label class="control-label col-md-2" for=""> &nbsp;</label>
             <button type="submit" class="btn btn-primary form-control" style="margin-left:1%;" id="btnAdd">
                 Add
             </button>
-        </div> 
+        </div>
     </div>
-        <br />
-        <ul class="pagination">
-            @for (int i = 1; i <= Model.PageCount(); i++)
-            {
-                <li class="@(i == Model.CurrentPage ? "page-item active" : "page-item")">
-                    <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
-                </li>
-            }
-        </ul>
+    <br />
+   
 
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script type="text/javascript">
+            $(function () {
+                //Remove the dummy row if data present.
+                if ($("#tblCategory tr").length > 2) {
+                    $("#tblCategory tr:eq(1)").remove();
+                } else {
+                    var row = $("#tblCategory tr:last-child");
+                    row.find(".Edit").hide();
+                    row.find(".Delete").hide();
+                    row.find("span").html('&nbsp;');
+                }
+            });
 
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-        <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
-        <script type="text/javascript">
-            function AppendRow(row, prodID, name, catID, catname) {
-                //Bind ProductID.
-                $(".ProductID", row).find("span").html(prodID);
-
-                //Bind ProductName.
-                $(".ProductName", row).find("span").html(name);
-                $(".ProductName", row).find("input").val(name);
-
+            function AppendRow(row,catID, catname) {
+              
                 //Bind CategoryID.
                 $(".CategoryID", row).find("span").html(catID);
-                //$(".CategoryID", row).find("input").val(catID);
 
                 //Bind CategoryName.
                 $(".CategoryName", row).find("span").html(catname);
@@ -134,50 +116,44 @@
 
                 row.find(".Edit").show();
                 row.find(".Delete").show();
-                $("#tblProduct").append(row);
+                $("#tblCategory").append(row);
             };
 
             //Add event handler.
-            $("body").on("click", "#btnAdd", function () {
-                var txtName = $("#txtProductName");               
-                var txtCategoryName = $("#txtCategoryName  option:selected");
-                if (txtName.val() != "" && txtCategoryName.val() != "")
+            $("body").on("click", "#btnAdd", function () {    
+                var txtCategoryName = $("#txtCategoryName");
+                if (txtCategoryName != "")
                 {
-                   
+
                 }
                 else {
-                    alert("All fields are required");
+                    alert("Category Name is required");
                     return false;
                 }
                 $.ajax({
                     type: "POST",
-                    url: "/Home/InsertProduct",
-                    data: '{ProductName: "' + txtName.val() + '", CategoryID: "' + txtCategoryName.val() + '", CategoryName: "' + txtCategoryName.text() + '" }',
+                    url: "/Category/InsertCategory",
+                    data: '{CategoryName: "' + txtCategoryName.val() + '" }',
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (r) {
-                        var row = $("#tblProduct tr:last-child");
-                        if ($("#tblProduct tr:last-child span").eq(0).html() != "&nbsp;") {
+                        var row = $("#tblCategory tr:last-child");
+                        if ($("#tblCategory tr:last-child span").eq(0).html() != "&nbsp;") {
                             row = row.clone();
                         }
-                        AppendRow(row, r.ProductID, r.ProductName, r.CategoryID, r.CategoryName);
-                        txtName.val("");
+                        AppendRow(row, r.CategoryID, r.CategoryName);
+                        
                         txtCategoryName.val("");
                     }
                 });
             });
 
             //Edit event handler.
-            $("body").on("click", "#tblProduct .Edit", function () {
+            $("body").on("click", "#tblCategory .Edit", function () {
                 var row = $(this).closest("tr");
                 $("td", row).each(function () {
                     if ($(this).find("input").length > 0) {
-                        $(this).find("input").show();                       
-                        $(this).find("span").hide();
-                    }
-                    if ($(this).find("select").length > 0) {
-                        $(this).find('select').val($(this).prev().find("input").val()).prop('selected', "selected");
-                        $(this).find("select").show();                        
+                        $(this).find("input").show();
                         $(this).find("span").hide();
                     }
                 });
@@ -188,37 +164,15 @@
             });
 
             //Update event handler.
-            $("body").on("click", "#tblProduct .Update", function () {
+            $("body").on("click", "#tblCategory .Update", function () {
                 var row = $(this).closest("tr");
-                var i = 0;
                 $("td", row).each(function () {
-                    i = i + 1;
                     if ($(this).find("input").length > 0) {
-                        if (i == 2) {
-                            var span = $(this).find("span");
-                            var input = $(this).find("input");
-                            span.html(input.val());
-                            span.show();
-                            input.hide();
-                        }
-                        if (i == 3)
-                        {
-                            var span = $(this).find("span");
-                            var input = $(this).next().find("select");
-                            span.html(input.val());
-                            span.show();
-                            $(this).find("input").hide();
-                        }
-                                               
-                    }
-                    if ($(this).find("select").length > 0) {
-                        
-                            var span = $(this).find("span");
-                            var input = $(this).find("select option:selected");
-                            span.html(input.text());
-                            span.show();
-                            $(this).find("select").hide();
-                        
+                        var span = $(this).find("span");
+                        var input = $(this).find("input");
+                        span.html(input.val());
+                        span.show();
+                        input.hide();
                     }
                 });
                 row.find(".Edit").show();
@@ -226,22 +180,20 @@
                 row.find(".Cancel").hide();
                 $(this).hide();
 
-                var product = {};
-                product.ProductID = row.find(".ProductID").find("span").html();
-                product.CategoryID = row.find(".CategoryID").find("span").html();
-                product.ProductName = row.find(".ProductName").find("span").html();
-                product.CategoryName = row.find(".CategoryName").find("span").html();
+                var category = {};
+                category.CategoryID = row.find(".CategoryID").find("span").html();
+                category.CategoryName = row.find(".CategoryName").find("span").html();
                 $.ajax({
                     type: "POST",
-                    url: "/Home/UpdateProduct",
-                    data: '{product:' + JSON.stringify(product) + '}',
+                    url: "/Category/UpdateCategory",
+                    data: '{category:' + JSON.stringify(category) + '}',
                     contentType: "application/json; charset=utf-8",
                     dataType: "json"
                 });
             });
 
             //Cancel event handler.
-            $("body").on("click", "#tblProduct .Cancel", function () {
+            $("body").on("click", "#tblCategory .Cancel", function () {
                 var row = $(this).closest("tr");
                 $("td", row).each(function () {
                     if ($(this).find("input").length > 0) {
@@ -259,18 +211,18 @@
             });
 
             //Delete event handler.
-            $("body").on("click", "#tblProduct .Delete", function () {
+            $("body").on("click", "#tblCategory .Delete", function () {
                 if (confirm("Do you want to delete this row?")) {
                     var row = $(this).closest("tr");
                     var prodID = row.find("span").eq("0").html();
                     $.ajax({
                         type: "POST",
-                        url: "/Home/DeleteProduct",
+                        url: "/Category/DeleteCategory",
                         data: '{prodID: ' + prodID + '}',
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         success: function (response) {
-                            if ($("#tblProduct tr").length > 2) {
+                            if ($("#tblCategory tr").length > 2) {
                                 row.remove();
                             } else {
                                 row.find(".Edit").hide();
@@ -307,6 +259,6 @@
                     return false;
                 });
             });
-        </script>
+    </script>
 </body>
 </html>
